@@ -54,6 +54,7 @@ export function mapBackendDashboard(authUser: BackendAuthUser, referrer: Backend
       totalEarned: referrer.totalRevenue,
       paid: referrer.paidOut,
       pending: referrer.balance,
+      completedJobs: referrer.successfulReferrals,
     },
     stats: {
       totalReferrals: referrer.totalReferrals,
@@ -132,6 +133,10 @@ export function mapReferralToEarningsTransaction(referral: Referral): EarningsTr
     date: referral.submittedAt,
     dateLabel: 'Referral submitted',
   };
+}
+
+export function countCompletedReferrals(referrals: Referral[]): number {
+  return referrals.filter((referral) => referral.status === 'completed').length;
 }
 
 export function mapBackendAppointmentToEarningsTransaction(appointment: BackendAppointment): EarningsTransaction {

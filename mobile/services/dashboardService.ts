@@ -1,7 +1,7 @@
 import { mockRepository } from './mockRepository';
 import type { DashboardData } from '../types';
 import { getReferrerAccount } from './profileService';
-import { mapBackendDashboard } from './backendMappers';
+import { countCompletedReferrals, mapBackendDashboard } from './backendMappers';
 import { getReferralsForReferrer } from './referralService';
 
 const useMockApi = process.env.EXPO_PUBLIC_USE_MOCK_API !== 'false';
@@ -11,11 +11,13 @@ export async function getDashboard(): Promise<DashboardData> {
   const { authUser, referrer } = await getReferrerAccount();
   const referrals = await getReferralsForReferrer(referrer);
   const dashboard = mapBackendDashboard(authUser, referrer);
+  const completedJobs = countCompletedReferrals(referrals);
   return {
     ...dashboard,
+    earnings: { ...dashboard.earnings, completedJobs },
     stats: {
       totalReferrals: referrals.length,
-      completedReferrals: referrals.filter((referral) => referral.status === 'completed').length,
+      completedReferrals: completedJobs,
       pendingReferrals: referrals.filter((referral) => referral.status === 'pending' || referral.status === 'booked').length,
       paidReferrals: referrals.filter((referral) => referral.commission.status === 'paid').length,
     },

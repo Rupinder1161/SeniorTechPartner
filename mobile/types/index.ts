@@ -87,6 +87,7 @@ export interface EarningsSummary {
   paid: number;
   approved?: number;
   pending: number;
+  completedJobs?: number;
 }
 
 export interface EarningsTransaction {

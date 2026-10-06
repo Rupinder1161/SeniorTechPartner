@@ -23,6 +23,7 @@ export const earningsSummary: EarningsSummary = {
   paid: 300,
   approved: 40,
   pending: 80,
+  completedJobs: 15,
 };
 
 export const dashboardStats: DashboardStats = {

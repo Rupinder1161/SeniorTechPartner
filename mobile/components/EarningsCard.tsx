@@ -5,9 +5,9 @@ import { formatCurrency } from '../utils/format';
 
 export function EarningsCard({ summary }: { summary: EarningsSummary }) {
   const items = [
-    { label: 'PAID', value: summary.paid },
-    { label: 'APPROVED', value: summary.approved },
-    { label: 'PENDING', value: summary.pending },
+    { label: 'PAID', value: summary.paid, currency: true },
+    { label: 'COMPLETED JOBS', value: summary.completedJobs, currency: false },
+    { label: 'PENDING', value: summary.pending, currency: true },
   ];
   return (
     <View style={styles.card}>
@@ -15,7 +15,7 @@ export function EarningsCard({ summary }: { summary: EarningsSummary }) {
       <Text style={styles.total}>{formatCurrency(summary.totalEarned)}</Text>
       <View style={styles.rule} />
       <View style={styles.row}>
-        {items.map((item) => <View key={item.label} style={styles.metric}><Text style={styles.label}>{item.label}</Text><Text style={styles.value}>{item.value === undefined ? '—' : formatCurrency(item.value)}</Text></View>)}
+        {items.map((item) => <View key={item.label} style={styles.metric}><Text style={styles.label}>{item.label}</Text><Text style={styles.value}>{item.value === undefined ? '—' : item.currency ? formatCurrency(item.value) : item.value}</Text></View>)}
       </View>
     </View>
   );

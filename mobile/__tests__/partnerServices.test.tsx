@@ -36,8 +36,10 @@ describe('partner data services', () => {
     const screen = await render(<EarningsCard summary={summary} />);
     expect(screen.getByText('$420')).toBeTruthy();
     expect(screen.getByText('$300')).toBeTruthy();
-    expect(screen.getByText('$40')).toBeTruthy();
     expect(screen.getByText('$80')).toBeTruthy();
+    expect(screen.getByText('COMPLETED JOBS')).toBeTruthy();
+    expect(screen.getByText('15')).toBeTruthy();
+    expect(screen.queryByText('APPROVED')).toBeNull();
     expect(history.map((transaction) => transaction.status)).toEqual(['paid', 'approved', 'pending']);
   });
 });

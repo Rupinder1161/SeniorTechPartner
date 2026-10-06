@@ -1,4 +1,4 @@
-import { appointmentBelongsToReferrer, getBackendUserId, mapBackendAppointment, mapBackendAppointmentToEarningsTransaction, mapBackendDashboard, mapBackendReferrerUser } from '../services/backendMappers';
+import { appointmentBelongsToReferrer, countCompletedReferrals, getBackendUserId, mapBackendAppointment, mapBackendAppointmentToEarningsTransaction, mapBackendDashboard, mapBackendReferrerUser } from '../services/backendMappers';
 
 describe('backend identity mapping', () => {
   const authUser = { id: 'user-1', name: 'Aroha Te Rangi', email: 'aroha@example.com', role: 'referrer' };
@@ -44,7 +44,7 @@ describe('backend identity mapping', () => {
   it('maps authoritative referrer totals without inventing unavailable approved or paid counts', () => {
     const dashboard = mapBackendDashboard(authUser, referrer);
     expect(dashboard.stats).toEqual({ totalReferrals: 8, completedReferrals: 5, pendingReferrals: 2 });
-    expect(dashboard.earnings).toEqual({ totalEarned: 100, paid: 60, pending: 40 });
+    expect(dashboard.earnings).toEqual({ totalEarned: 100, paid: 60, pending: 40, completedJobs: 5 });
     expect(dashboard.recentReferrals).toBeUndefined();
   });
 
@@ -72,6 +72,14 @@ describe('backend identity mapping', () => {
     expect(referral.status).toBe('completed');
     expect(referral.commission.status).toBe('pending');
     expect(referral.commission.amount).toBeUndefined();
+  });
+
+  it('counts completed jobs from the same mapped referrals shown in the list', () => {
+    const referrals = [
+      mapBackendAppointment({ _id: 'done', customerName: 'One', phone: '1', issueType: 'PC', createdAt: '2026-10-05', referralStatus: 'successful' }),
+      mapBackendAppointment({ _id: 'pending', customerName: 'Two', phone: '2', issueType: 'PC', createdAt: '2026-10-05', referralStatus: 'scheduled' }),
+    ];
+    expect(countCompletedReferrals(referrals)).toBe(1);
   });
 
   it('maps referrals into earnings history using reward flag and submission date only', () => {
