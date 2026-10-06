@@ -21,7 +21,7 @@ export default function ReferralDetailScreen() {
     <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Go back" style={styles.back}><Feather name="arrow-left" size={21} color={colors.ink} /><Text style={styles.backText}>My Referrals</Text></Pressable>
     <View style={styles.panel}><Text style={styles.name}>{referral.customer.name}</Text><Text style={styles.problem}>{referral.problem}</Text><Text style={styles.label}>Submitted {formatDate(referral.submittedAt)}</Text><View style={styles.badges}><StatusBadge status={referral.status} /><CommissionBadge status={referral.commission.status} /></View></View>
     <View style={styles.panel}><Text style={styles.sectionTitle}>Customer details</Text><Detail label="Phone" value={referral.customer.phone} /><Detail label="Email" value={referral.customer.email || 'Not provided'} /><Detail label="Address" value={referral.customer.address || 'Not provided'} /><Detail label="Support required" value={referral.problem} /></View>
-    <View style={styles.panel}><Text style={styles.sectionTitle}>Commission</Text><View style={styles.commission}><Text style={styles.amount}>{formatCurrency(referral.commission.amount)}</Text><CommissionBadge status={referral.commission.status} /></View></View>
+    <View style={styles.panel}><Text style={styles.sectionTitle}>Commission</Text><View style={styles.commission}><Text style={styles.amount}>{referral.commission.amount === undefined ? '—' : formatCurrency(referral.commission.amount)}</Text><CommissionBadge status={referral.commission.status} /></View></View>
     <View style={styles.panel}><Text style={styles.sectionTitle}>Referral progress</Text><ReferralTimeline referral={referral} /></View>
   </ScrollView></SafeAreaView>;
 }

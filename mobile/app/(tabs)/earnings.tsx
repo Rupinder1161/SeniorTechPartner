@@ -19,17 +19,21 @@ export default function EarningsScreen() {
   const summary = useEarningsQuery();
   const history = useEarningsHistoryQuery();
   const [filter, setFilter] = useState<Filter>('All');
-  if (summary.isLoading || history.isLoading) return <SafeAreaView style={styles.safe}><LoadingState label="Loading earnings…" /></SafeAreaView>;
-  if (summary.isError || history.isError || !summary.data || !history.data) return <SafeAreaView style={styles.safe}><ErrorState message={getUserMessage(summary.error ?? history.error)} onRetry={() => { void summary.refetch(); void history.refetch(); }} /></SafeAreaView>;
-  const transactions = history.data.filter((transaction) => filter === 'All' || transaction.status === filter.toLowerCase());
+  if (summary.isLoading) return <SafeAreaView style={styles.safe}><LoadingState label="Loading earnings…" /></SafeAreaView>;
+  if (summary.isError || !summary.data) return <SafeAreaView style={styles.safe}><ErrorState message={getUserMessage(summary.error)} onRetry={() => { void summary.refetch(); }} /></SafeAreaView>;
+  const transactions = (history.data ?? []).filter((transaction) => filter === 'All' || transaction.status === filter.toLowerCase());
   return <SafeAreaView style={styles.safe} edges={['top']}><FlatList
     data={transactions}
     keyExtractor={(item) => item.id}
     contentContainerStyle={styles.page}
     ListHeaderComponent={<View style={styles.header}><ScreenHeader title="Earnings" subtitle="Your commission at a glance." /><EarningsCard summary={summary.data} /><Text style={styles.title}>Earnings history</Text><FilterTabs options={filters} selected={filter} onSelect={setFilter} /></View>}
     ItemSeparatorComponent={() => <View style={{ height: 9 }} />}
-    renderItem={({ item }) => <View style={styles.transaction}><View style={styles.left}><Text style={styles.customer}>{item.customerName}</Text><CommissionBadge status={item.status} /><Text style={styles.date}>{formatDate(item.date)}</Text></View><Text style={styles.amount}>{formatCurrency(item.amount)}</Text></View>}
-    ListEmptyComponent={<EmptyState title="No earnings yet" description="Commission activity will appear here when your referrals progress." />}
+    renderItem={({ item }) => <View style={styles.transaction}><View style={styles.left}><Text style={styles.customer}>{item.customerName}</Text><CommissionBadge status={item.status} /><Text style={styles.date}>{item.dateLabel ? `${item.dateLabel} · ` : ''}{formatDate(item.date)}</Text></View><Text style={styles.amount}>{item.amount === undefined ? '—' : formatCurrency(item.amount)}</Text></View>}
+    ListEmptyComponent={history.isError
+      ? <ErrorState message={getUserMessage(history.error)} onRetry={() => { void history.refetch(); }} />
+      : history.isLoading
+        ? <LoadingState label="Loading earnings history…" />
+        : <EmptyState title="No earnings yet" description="Commission activity will appear here when your referrals progress." />}
   /></SafeAreaView>;
 }
 

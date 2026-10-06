@@ -35,12 +35,10 @@ class MockRepository {
     const referral: Referral = {
       id: `ref-${Date.now()}`,
       customer: { name: data.customerName, phone: data.phone, email: data.email, address: data.address },
-      problem: data.problem,
+      problem: data.issueType === 'other' ? data.issueDescription : `${data.issueType.toUpperCase()}: ${data.issueDescription}`,
       submittedAt: new Date().toISOString(),
       status: 'pending',
       commission: { amount: 20, status: 'pending' },
-      preferredContactMethod: data.preferredContactMethod,
-      notes: data.notes,
       timeline: {},
     };
     this.referrals = [referral, ...this.referrals];

@@ -10,6 +10,7 @@ export type ReferralStatus =
 
 export type CommissionStatus = 'pending' | 'approved' | 'paid' | 'rejected';
 export type PreferredContactMethod = 'phone' | 'email' | 'text';
+export type AppointmentIssueType = 'mobile' | 'pc' | 'wifi' | 'other';
 
 export interface User {
   id: string;
@@ -19,6 +20,7 @@ export interface User {
   phone: string;
   partnerSince: string;
   role: 'referral-partner';
+  referralCode?: string;
 }
 
 export interface Customer {
@@ -29,8 +31,30 @@ export interface Customer {
 }
 
 export interface Commission {
-  amount: number;
+  amount?: number;
   status: CommissionStatus;
+}
+
+export interface BackendAppointment {
+  _id: string;
+  customerName?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  issueType?: string;
+  issueDescription?: string;
+  createdAt?: string;
+  status?: string;
+  referralStatus?: string;
+  referralCode?: string;
+  referrer?: { email?: string; referralCode?: string };
+  referralRewardGiven?: boolean;
+}
+
+export interface AddressCheckResponse {
+  valid: boolean;
+  formattedAddress?: string;
+  message?: string;
 }
 
 export interface Referral {
@@ -55,29 +79,30 @@ export interface DashboardStats {
   totalReferrals: number;
   completedReferrals: number;
   pendingReferrals: number;
-  paidReferrals: number;
+  paidReferrals?: number;
 }
 
 export interface EarningsSummary {
   totalEarned: number;
   paid: number;
-  approved: number;
+  approved?: number;
   pending: number;
 }
 
 export interface EarningsTransaction {
   id: string;
   customerName: string;
-  amount: number;
+  amount?: number;
   status: CommissionStatus;
   date: string;
+  dateLabel?: string;
 }
 
 export interface DashboardData {
   user: User;
   earnings: EarningsSummary;
   stats: DashboardStats;
-  recentReferrals: Referral[];
+  recentReferrals?: Referral[];
 }
 
 export interface Notification {
@@ -91,6 +116,36 @@ export interface Notification {
 export interface AuthResponse {
   user: User;
   token: string;
+}
+
+export interface BackendAuthUser {
+  id?: string;
+  _id?: string;
+  name?: string;
+  email?: string;
+  role?: string;
+}
+
+export interface BackendLoginResponse {
+  token?: string;
+  user?: BackendAuthUser;
+}
+
+export interface BackendReferrer {
+  _id: string;
+  userId: string | BackendAuthUser;
+  name: string;
+  email: string;
+  phone: string;
+  createdAt: string;
+  referralCode: string;
+  totalReferrals: number;
+  scheduledReferrals: number;
+  successfulReferrals: number;
+  unsuccessfulReferrals: number;
+  totalRevenue: number;
+  paidOut: number;
+  balance: number;
 }
 
 export interface LoginCredentials {
@@ -113,10 +168,13 @@ export interface CreateReferralData {
   customerName: string;
   phone: string;
   email?: string;
-  address?: string;
-  problem: string;
-  preferredContactMethod?: PreferredContactMethod;
-  notes?: string;
+  address: string;
+  issueType: AppointmentIssueType;
+  issueDescription: string;
+  referralCode: string;
+  preferredDate?: string;
+  preferredTime?: string;
+  consentAccepted: boolean;
 }
 
 export type UpdateProfileData = Pick<User, 'firstName' | 'lastName' | 'email' | 'phone'>;

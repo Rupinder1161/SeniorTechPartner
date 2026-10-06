@@ -9,7 +9,7 @@ export function ReferralCard({ referral, onPress }: { referral: Referral; onPres
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${referral.customer.name}, ${referral.problem}, ${referral.status}`} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View style={styles.top}>
-        <View style={styles.details}><View style={styles.nameRow}><Text style={styles.name}>{referral.customer.name}</Text><Text style={styles.amount}>{formatCurrency(referral.commission.amount)}</Text></View><Text style={styles.problem}>{referral.problem}</Text><Text style={styles.date}>Submitted {formatDate(referral.submittedAt)}</Text></View>
+        <View style={styles.details}><View style={styles.nameRow}><Text style={styles.name}>{referral.customer.name}</Text><Text style={styles.amount}>{referral.commission.amount === undefined ? '—' : formatCurrency(referral.commission.amount)}</Text></View><Text style={styles.problem}>{referral.problem}</Text><Text style={styles.date}>Submitted {formatDate(referral.submittedAt)}</Text></View>
         <Feather name="chevron-right" size={20} color={colors.muted} />
       </View>
       <View style={styles.badges}><StatusBadge status={referral.status} /><CommissionBadge status={referral.commission.status} /></View>

@@ -15,7 +15,7 @@ export function EarningsCard({ summary }: { summary: EarningsSummary }) {
       <Text style={styles.total}>{formatCurrency(summary.totalEarned)}</Text>
       <View style={styles.rule} />
       <View style={styles.row}>
-        {items.map((item) => <View key={item.label} style={styles.metric}><Text style={styles.label}>{item.label}</Text><Text style={styles.value}>{formatCurrency(item.value)}</Text></View>)}
+        {items.map((item) => <View key={item.label} style={styles.metric}><Text style={styles.label}>{item.label}</Text><Text style={styles.value}>{item.value === undefined ? '—' : formatCurrency(item.value)}</Text></View>)}
       </View>
     </View>
   );

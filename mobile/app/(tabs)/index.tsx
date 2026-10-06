@@ -26,10 +26,10 @@ export default function DashboardScreen() {
       <StatCard label="TOTAL REFERRALS" value={stats.totalReferrals} />
       <StatCard label="COMPLETED" value={stats.completedReferrals} />
       <StatCard label="PENDING" value={stats.pendingReferrals} />
-      <StatCard label="PAID" value={stats.paidReferrals} />
+      <StatCard label="PAID" value={stats.paidReferrals ?? '—'} />
     </View>
-    <View style={styles.sectionHeading}><Text style={styles.sectionTitle}>Recent referrals</Text><Pressable onPress={() => router.push('/(tabs)/referrals')} accessibilityRole="button"><Text style={styles.viewAll}>View all referrals</Text></Pressable></View>
-    <View style={styles.recent}>{recentReferrals.map((referral) => <ReferralCard key={referral.id} referral={referral} onPress={() => router.push(`/referrals/${referral.id}`)} />)}</View>
+    <View style={styles.sectionHeading}><Text style={styles.sectionTitle}>Recent referrals</Text>{recentReferrals ? <Pressable onPress={() => router.push('/(tabs)/referrals')} accessibilityRole="button"><Text style={styles.viewAll}>View all referrals</Text></Pressable> : null}</View>
+    {recentReferrals ? <View style={styles.recent}>{recentReferrals.map((referral) => <ReferralCard key={referral.id} referral={referral} onPress={() => router.push(`/referrals/${referral.id}`)} />)}</View> : <Text style={styles.subheading}>Referral details aren’t available through the current partner API.</Text>}
   </ScrollView></SafeAreaView>;
 }
 

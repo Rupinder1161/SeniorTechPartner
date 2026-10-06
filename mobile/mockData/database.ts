@@ -15,6 +15,7 @@ export const initialUser: User = {
   phone: '021 555 0142',
   partnerSince: '2024-03-12T00:00:00.000Z',
   role: 'referral-partner',
+  referralCode: 'ALEX20',
 };
 
 export const earningsSummary: EarningsSummary = {

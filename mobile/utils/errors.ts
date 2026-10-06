@@ -1,11 +1,20 @@
 import axios from 'axios';
 
 export function getUserMessage(error: unknown): string {
-  if (!axios.isAxiosError(error)) return 'Something went wrong. Please try again.';
+  if (!axios.isAxiosError(error)) {
+    return error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+  }
   if (!error.response) {
     return error.code === 'ECONNABORTED'
       ? 'The request timed out. Please try again.'
       : 'Unable to connect. Check your internet connection and try again.';
+  }
+
+  if ([400, 403, 404, 422].includes(error.response.status)) {
+    const response = error.response.data;
+    if (response && typeof response === 'object' && 'message' in response && typeof response.message === 'string') {
+      return response.message;
+    }
   }
 
   const messages: Record<number, string> = {

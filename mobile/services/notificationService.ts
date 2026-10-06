@@ -1,5 +1,4 @@
 import * as Notifications from 'expo-notifications';
-import api from './api';
 import { initialNotifications } from '../mockData/database';
 import type { Notification } from '../types';
 
@@ -16,14 +15,13 @@ Notifications.setNotificationHandler({
 
 export async function getNotifications(): Promise<Notification[]> {
   if (useMockApi) return [...initialNotifications];
-  const { data } = await api.get<Notification[]>('/notifications');
-  return data;
+  throw new Error('The backend does not provide a partner notifications endpoint yet.');
 }
 
 export async function requestNotificationPermission(): Promise<string | null> {
   const permission = await Notifications.requestPermissionsAsync();
   if (!permission.granted) return null;
   const token = await Notifications.getExpoPushTokenAsync();
-  if (!useMockApi) await api.post('/notifications/device-token', { token: token.data });
+  if (!useMockApi) throw new Error('The backend does not support registering push notifications yet.');
   return token.data;
 }

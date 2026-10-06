@@ -11,12 +11,21 @@ describe('partner data services', () => {
   });
 
   it('creates a referral, returns it in the list, and refreshes referral counts', async () => {
-    const created = await createReferral({ customerName: 'Casey Test', phone: '021 555 0199', problem: 'Tablet setup' });
+    await createReferral({
+      customerName: 'Casey Test',
+      phone: '021 555 0199',
+      address: '1 Kauri Road, Wellington',
+      issueType: 'other',
+      issueDescription: 'Tablet setup',
+      referralCode: 'ALEX20',
+      consentAccepted: true,
+    });
     const referrals = await getReferrals();
     const dashboard = await getDashboard();
-    expect(referrals.find((referral) => referral.id === created.id)?.customer.name).toBe('Casey Test');
-    expect(created.status).toBe('pending');
-    expect(created.commission.status).toBe('pending');
+    const created = referrals.find((referral) => referral.customer.name === 'Casey Test');
+    expect(created?.problem).toBe('Tablet setup');
+    expect(created?.status).toBe('pending');
+    expect(created?.commission.status).toBe('pending');
     expect(dashboard.stats.totalReferrals).toBe(22);
     expect(dashboard.stats.pendingReferrals).toBe(4);
   });

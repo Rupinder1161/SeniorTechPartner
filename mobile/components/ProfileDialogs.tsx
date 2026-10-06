@@ -15,7 +15,7 @@ const profileSchema = z.object({
   phone: z.string().trim().min(7, 'Enter a valid phone number'),
 });
 type ProfileValues = z.infer<typeof profileSchema>;
-const passwordSchema = z.object({ currentPassword: z.string().min(1, 'Current password is required'), newPassword: z.string().min(8, 'Use at least 8 characters'), confirmPassword: z.string() }).refine((values) => values.newPassword === values.confirmPassword, { path: ['confirmPassword'], message: 'Passwords do not match' });
+const passwordSchema = z.object({ currentPassword: z.string().min(1, 'Current password is required'), newPassword: z.string().min(1, 'New password is required'), confirmPassword: z.string() }).refine((values) => values.newPassword === values.confirmPassword, { path: ['confirmPassword'], message: 'Passwords do not match' });
 type PasswordValues = z.infer<typeof passwordSchema>;
 
 export function EditProfileDialog({ visible, user, saving, onClose, onSave }: { visible: boolean; user: User; saving: boolean; onClose: () => void; onSave: (data: UpdateProfileData) => void }) {
