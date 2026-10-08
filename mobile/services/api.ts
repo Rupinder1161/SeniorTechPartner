@@ -6,6 +6,7 @@ import { notifyUnauthorized } from './authEvents';
 const tokenKey = 'seniortech.authToken';
 let webToken: string | null = null;
 const apiHost = (process.env.EXPO_PUBLIC_API_URL ?? 'https://backend-snw4.onrender.com').replace(/\/+$/, '');
+export const isMockApiEnabled = process.env.EXPO_PUBLIC_USE_MOCK_API !== 'false';
 
 export const tokenStorage = {
   get: () => Platform.OS === 'web' ? Promise.resolve(webToken) : SecureStore.getItemAsync(tokenKey),

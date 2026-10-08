@@ -27,7 +27,16 @@ class MockRepository {
     return this.getUser();
   }
   getDashboard() {
-    return { user: this.getUser(), earnings: earningsSummary, stats: { ...this.stats }, recentReferrals: this.referrals.slice(0, 3) };
+    return {
+      user: this.getUser(),
+      earnings: earningsSummary,
+      stats: {
+        ...this.stats,
+        pendingReferrals: this.referrals.filter((referral) => referral.status === 'pending').length,
+        inProgressReferrals: this.referrals.filter((referral) => referral.status === 'contacted' || referral.status === 'booked').length,
+      },
+      recentReferrals: this.referrals.slice(0, 3),
+    };
   }
   getReferrals(): Referral[] { return [...this.referrals]; }
   getReferral(id: string): Referral | undefined { return this.referrals.find((referral) => referral.id === id); }

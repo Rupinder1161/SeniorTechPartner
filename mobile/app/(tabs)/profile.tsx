@@ -9,11 +9,13 @@ import { EditProfileDialog, ChangePasswordDialog } from '../../components/Profil
 import { colors, radius, spacing } from '../../constants/theme';
 import { queryKeys, useProfileQuery } from '../../hooks/useAppQueries';
 import { useAuth } from '../../providers/AuthProvider';
+import { isMockApiEnabled } from '../../services/api';
 import { updateProfile } from '../../services/profileService';
 import { changePassword } from '../../services/authService';
 import type { UpdateProfileData } from '../../types';
 import { formatDate } from '../../utils/format';
 import { getUserMessage } from '../../utils/errors';
+import { promptToContactSeniorTech } from '../../utils/contact';
 
 export default function ProfileScreen() {
   const query = useProfileQuery();
@@ -31,7 +33,7 @@ export default function ProfileScreen() {
   return <SafeAreaView style={styles.safe} edges={['top']}><View style={styles.page}>
     <ScreenHeader title="Your profile" subtitle="Your SeniorTech partner details." />
     <View style={styles.panel}><ProfileRow label="First name" value={user.firstName} /><ProfileRow label="Last name" value={user.lastName} /><ProfileRow label="Email" value={user.email} /><ProfileRow label="Phone" value={user.phone} /><ProfileRow label="Partner since" value={formatDate(user.partnerSince)} /></View>
-    <View style={styles.actions}><PrimaryButton title="Edit profile" onPress={() => setEditVisible(true)} /><SecondaryButton title="Change password" onPress={() => setPasswordVisible(true)} /><SecondaryButton title="Sign out" onPress={confirmLogout} /></View>
+    <View style={styles.actions}><PrimaryButton title="Edit profile" onPress={() => { if (isMockApiEnabled) setEditVisible(true); else promptToContactSeniorTech('update your profile'); }} /><SecondaryButton title="Change password" onPress={() => { if (isMockApiEnabled) setPasswordVisible(true); else promptToContactSeniorTech('change your password'); }} /><SecondaryButton title="Sign out" onPress={confirmLogout} /></View>
     <EditProfileDialog visible={editVisible} user={user} saving={profileMutation.isPending} onClose={() => setEditVisible(false)} onSave={edit} />
     <ChangePasswordDialog visible={passwordVisible} saving={passwordMutation.isPending} onClose={() => setPasswordVisible(false)} onSave={(data) => passwordMutation.mutate(data)} />
   </View></SafeAreaView>;

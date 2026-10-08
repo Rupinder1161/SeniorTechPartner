@@ -58,19 +58,20 @@ describe('backend identity mapping', () => {
     expect(appointmentBelongsToReferrer({ _id: 'appt-3', referralCode: 'other' }, referrer)).toBe(false);
   });
 
-  it('maps appointment display fields without inventing per-referral commission amounts', () => {
+  it('maps completed job status ahead of a stale referral status', () => {
     const referral = mapBackendAppointment({
       _id: 'appt-4',
       customerName: 'Pat Lee',
       phone: '021 555 0150',
       issueType: 'Computer Support',
       createdAt: '2026-10-05T00:00:00.000Z',
-      referralStatus: 'successful',
-      referralRewardGiven: false,
+      status: 'Completed',
+      referralStatus: 'scheduled',
+      referralRewardGiven: true,
     });
     expect(referral.customer.name).toBe('Pat Lee');
     expect(referral.status).toBe('completed');
-    expect(referral.commission.status).toBe('pending');
+    expect(referral.commission.status).toBe('approved');
     expect(referral.commission.amount).toBeUndefined();
   });
 
@@ -82,7 +83,7 @@ describe('backend identity mapping', () => {
     expect(countCompletedReferrals(referrals)).toBe(1);
   });
 
-  it('maps referrals into earnings history using reward flag and submission date only', () => {
+  it('maps credited rewards to approved rather than paid in earnings history', () => {
     const transaction = mapBackendAppointmentToEarningsTransaction({
       _id: 'appt-paid',
       customerName: 'Pat Lee',
@@ -92,7 +93,7 @@ describe('backend identity mapping', () => {
     expect(transaction).toEqual({
       id: 'appt-paid',
       customerName: 'Pat Lee',
-      status: 'paid',
+      status: 'approved',
       date: '2026-10-05T00:00:00.000Z',
       dateLabel: 'Referral submitted',
     });

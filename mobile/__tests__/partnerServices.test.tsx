@@ -3,11 +3,12 @@ import { EarningsCard } from '../components/EarningsCard';
 import { getDashboard } from '../services/dashboardService';
 import { getEarnings, getEarningsHistory } from '../services/earningsService';
 import { createReferral, getReferrals } from '../services/referralService';
+import { getNotifications } from '../services/notificationService';
 
 describe('partner data services', () => {
   it('returns dashboard statistics from the data layer', async () => {
     const dashboard = await getDashboard();
-    expect(dashboard.stats).toEqual({ totalReferrals: 21, completedReferrals: 15, pendingReferrals: 3, paidReferrals: 13 });
+    expect(dashboard.stats).toEqual({ totalReferrals: 21, completedReferrals: 15, pendingReferrals: 3, inProgressReferrals: 3 });
   });
 
   it('creates a referral, returns it in the list, and refreshes referral counts', async () => {
@@ -41,5 +42,17 @@ describe('partner data services', () => {
     expect(screen.getByText('15')).toBeTruthy();
     expect(screen.queryByText('APPROVED')).toBeNull();
     expect(history.map((transaction) => transaction.status)).toEqual(['paid', 'approved', 'pending']);
+  });
+
+  it('loads the existing mock notification feed', async () => {
+    const notifications = await getNotifications();
+    expect(notifications.length).toBeGreaterThan(0);
+    expect(notifications[0]).toMatchObject({
+      id: expect.any(String),
+      title: expect.any(String),
+      body: expect.any(String),
+      createdAt: expect.any(String),
+      read: expect.any(Boolean),
+    });
   });
 });

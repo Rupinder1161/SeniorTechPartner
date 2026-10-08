@@ -1,8 +1,7 @@
 import * as Notifications from 'expo-notifications';
+import api, { isMockApiEnabled } from './api';
 import { initialNotifications } from '../mockData/database';
 import type { Notification } from '../types';
-
-const useMockApi = process.env.EXPO_PUBLIC_USE_MOCK_API !== 'false';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -14,14 +13,35 @@ Notifications.setNotificationHandler({
 });
 
 export async function getNotifications(): Promise<Notification[]> {
-  if (useMockApi) return [...initialNotifications];
-  throw new Error('The backend does not provide a partner notifications endpoint yet.');
+  if (isMockApiEnabled) return [...initialNotifications];
+  const { data } = await api.get<Notification[]>('/notifications');
+  if (!Array.isArray(data) || data.some((item) => (
+    !item
+    || typeof item.id !== 'string'
+    || typeof item.title !== 'string'
+    || typeof item.body !== 'string'
+    || typeof item.createdAt !== 'string'
+    || typeof item.read !== 'boolean'
+    || (item.amount !== undefined && (typeof item.amount !== 'number' || !Number.isFinite(item.amount)))
+  ))) {
+    throw new Error('The backend returned an invalid notifications response.');
+  }
+  return data;
 }
 
 export async function requestNotificationPermission(): Promise<string | null> {
-  const permission = await Notifications.requestPermissionsAsync();
+  let permission = await Notifications.getPermissionsAsync();
+  if (!permission.granted) permission = await Notifications.requestPermissionsAsync();
   if (!permission.granted) return null;
-  const token = await Notifications.getExpoPushTokenAsync();
-  if (!useMockApi) throw new Error('The backend does not support registering push notifications yet.');
+
+  const projectId = process.env.EXPO_PUBLIC_EAS_PROJECT_ID;
+  if (!projectId && !isMockApiEnabled) {
+    throw new Error('Push notifications require EXPO_PUBLIC_EAS_PROJECT_ID. Configure an EAS project and restart the app.');
+  }
+
+  const token = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
+  if (!isMockApiEnabled) {
+    await api.post('/notifications/device-token', { token: token.data });
+  }
   return token.data;
 }

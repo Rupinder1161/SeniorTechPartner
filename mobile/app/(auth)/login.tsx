@@ -7,9 +7,11 @@ import { SeniorTechLogo } from '../../components/SeniorTechLogo';
 import { PrimaryButton } from '../../components/Buttons';
 import { TextInput } from '../../components/TextInput';
 import { colors, spacing } from '../../constants/theme';
+import { isMockApiEnabled } from '../../services/api';
 import { useAuth } from '../../providers/AuthProvider';
 import { getUserMessage } from '../../utils/errors';
 import { loginSchema, type LoginFormValues } from '../../utils/validation';
+import { promptToContactSeniorTech } from '../../utils/contact';
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -28,10 +30,10 @@ export default function LoginScreen() {
       <Controller control={control} name="email" render={({ field: { onChange, onBlur, value } }) => <TextInput label="Email address" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.email?.message} autoCapitalize="none" keyboardType="email-address" autoComplete="email" />} />
       <Controller control={control} name="password" render={({ field: { onChange, onBlur, value } }) => <TextInput label="Password" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.password?.message} secureTextEntry autoComplete="password" />} />
       {serverError ? <Text accessibilityRole="alert" style={styles.error}>{serverError}</Text> : null}
-      <Link href="/(auth)/forgot-password" style={styles.link}>Forgot password?</Link>
+      {isMockApiEnabled ? <Link href="/(auth)/forgot-password" style={styles.link}>Forgot password?</Link> : <Text accessibilityRole="link" onPress={() => promptToContactSeniorTech('reset your password')} style={styles.link}>Forgot password?</Text>}
       <PrimaryButton title="Sign in" onPress={submit} loading={isSubmitting} />
     </View>
-    <Text style={styles.footer}>New to SeniorTech? <Link href="/(auth)/register" style={styles.link}>Create a partner account</Link></Text>
+    <Text style={styles.footer}>New to SeniorTech? {isMockApiEnabled ? <Link href="/(auth)/register" style={styles.link}>Create a partner account</Link> : <Text accessibilityRole="link" onPress={() => promptToContactSeniorTech('join SeniorTech as a partner')} style={styles.link}>Create a partner account</Text>}</Text>
   </ScrollView></KeyboardAvoidingView>;
 }
 

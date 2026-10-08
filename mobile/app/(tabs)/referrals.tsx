@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { SearchBar, FilterTabs } from '../../components/SearchAndFilters';
@@ -11,21 +11,40 @@ import { useReferralsQuery } from '../../hooks/useAppQueries';
 import type { Referral } from '../../types';
 import { getUserMessage } from '../../utils/errors';
 
-const filters = ['All', 'Pending', 'Completed', 'Approved', 'Paid', 'Rejected'] as const;
+const filters = ['All', 'Pending', 'In progress', 'Completed', 'Approved', 'Paid', 'Rejected'] as const;
 type Filter = typeof filters[number];
 
 function matchesFilter(referral: Referral, filter: Filter): boolean {
   if (filter === 'All') return true;
-  if (filter === 'Pending') return ['pending', 'contacted', 'booked'].includes(referral.status);
-  if (filter === 'Approved' || filter === 'Paid') return referral.commission.status === filter.toLowerCase();
+  if (filter === 'Pending') return referral.status === 'pending';
+  if (filter === 'In progress') return ['contacted', 'booked'].includes(referral.status);
+  if (filter === 'Approved') return referral.commission.status === 'approved';
+  if (filter === 'Paid') return referral.status === 'paid' || referral.commission.status === 'paid';
   return referral.status === filter.toLowerCase();
 }
 
 export default function ReferralsScreen() {
   const router = useRouter();
+  const { filter: requestedFilter } = useLocalSearchParams<{ filter?: string }>();
   const query = useReferralsQuery();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<Filter>('All');
+  useEffect(() => {
+    if (!requestedFilter) {
+      setFilter('All');
+      return;
+    }
+    const filterByRoute: Record<string, Filter> = {
+      all: 'All',
+      pending: 'Pending',
+      'in-progress': 'In progress',
+      completed: 'Completed',
+      approved: 'Approved',
+      paid: 'Paid',
+      rejected: 'Rejected',
+    };
+    setFilter(filterByRoute[requestedFilter] ?? 'All');
+  }, [requestedFilter]);
   const referrals = useMemo(() => (query.data ?? []).filter((referral) => matchesFilter(referral, filter) && referral.customer.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase())), [filter, query.data, search]);
   const listHeader = <View style={styles.header}><ScreenHeader title="My Referrals" subtitle="Keep track of everyone you’ve referred." /><SearchBar value={search} onChangeText={setSearch} /><FilterTabs options={filters} selected={filter} onSelect={setFilter} /></View>;
   if (query.isLoading) return <SafeAreaView style={styles.safe}><View style={styles.page}>{listHeader}<LoadingState label="Loading referrals…" /></View></SafeAreaView>;

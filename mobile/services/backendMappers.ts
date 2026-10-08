@@ -1,5 +1,11 @@
 import type { BackendAppointment, BackendAuthUser, BackendReferrer, DashboardData, EarningsTransaction, Referral, User } from '../types';
 
+const completedJobStatuses = new Set([
+  'needs feedback',
+  'completed',
+  'completed and closed successfully',
+]);
+
 export function getBackendUserId(user: BackendAuthUser): string {
   if (!user || typeof user !== 'object') throw new Error('The backend returned an invalid current-user response.');
   const id = user.id ?? user._id;
@@ -74,6 +80,9 @@ export function appointmentBelongsToReferrer(appointment: BackendAppointment, re
 }
 
 function mapReferralStatus(appointment: BackendAppointment): Referral['status'] {
+  const jobStatus = (appointment.status ?? '').trim().toLocaleLowerCase();
+  if (completedJobStatuses.has(jobStatus)) return 'completed';
+
   const referralStatus = (appointment.referralStatus ?? '').trim().toLocaleLowerCase();
   const directStatus: Record<string, Referral['status']> = {
     pending: 'pending',
@@ -91,7 +100,6 @@ function mapReferralStatus(appointment: BackendAppointment): Referral['status'] 
   };
   if (directStatus[referralStatus]) return directStatus[referralStatus];
 
-  const jobStatus = (appointment.status ?? '').trim().toLocaleLowerCase();
   const jobStatusMap: Record<string, Referral['status']> = {
     scheduled: 'booked',
     assigned: 'contacted',
@@ -120,7 +128,7 @@ export function mapBackendAppointment(appointment: BackendAppointment): Referral
     problem,
     submittedAt: appointment.createdAt,
     status: mapReferralStatus(appointment),
-    commission: { status: appointment.referralRewardGiven ? 'paid' : 'pending' },
+    commission: { status: appointment.referralRewardGiven ? 'approved' : 'pending' },
     timeline: {},
   };
 }
@@ -146,7 +154,7 @@ export function mapBackendAppointmentToEarningsTransaction(appointment: BackendA
   return {
     id: appointment._id,
     customerName: appointment.customerName.trim(),
-    status: appointment.referralRewardGiven ? 'paid' : 'pending',
+    status: appointment.referralRewardGiven ? 'approved' : 'pending',
     date: appointment.createdAt,
     dateLabel: 'Referral submitted',
   };

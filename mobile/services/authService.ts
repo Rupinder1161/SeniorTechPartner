@@ -1,12 +1,10 @@
-import api, { tokenStorage } from './api';
+import api, { isMockApiEnabled, tokenStorage } from './api';
 import { mockRepository } from './mockRepository';
 import type { AuthResponse, BackendLoginResponse, ChangePasswordData, LoginCredentials, RegisterData } from '../types';
 import { getProfile } from './profileService';
 
-const useMockApi = process.env.EXPO_PUBLIC_USE_MOCK_API !== 'false';
-
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
-  if (!useMockApi) {
+  if (!isMockApiEnabled) {
     const { data } = await api.post<BackendLoginResponse>('/auth/login', credentials);
     if (!data.token || !data.user) throw new Error('The backend returned an invalid login response.');
     await tokenStorage.set(data.token);
@@ -23,7 +21,7 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
 }
 
 export async function register(data: RegisterData): Promise<AuthResponse> {
-  if (!useMockApi) {
+  if (!isMockApiEnabled) {
     void data;
     throw new Error('Partner registration is not available through the current backend flow. Contact SeniorTech to set up an account.');
   }
@@ -34,14 +32,14 @@ export async function register(data: RegisterData): Promise<AuthResponse> {
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {
-  if (!useMockApi) {
+  if (!isMockApiEnabled) {
     void email;
     throw new Error('Password reset is not available through the current backend. Contact SeniorTech for help.');
   }
 }
 
 export async function changePassword(input: ChangePasswordData): Promise<void> {
-  if (!useMockApi) {
+  if (!isMockApiEnabled) {
     void input;
     throw new Error('Secure password changes are not available through the current backend. Contact SeniorTech for help.');
   }

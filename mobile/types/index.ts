@@ -79,7 +79,7 @@ export interface DashboardStats {
   totalReferrals: number;
   completedReferrals: number;
   pendingReferrals: number;
-  paidReferrals?: number;
+  inProgressReferrals?: number;
 }
 
 export interface EarningsSummary {
@@ -110,6 +110,7 @@ export interface Notification {
   id: string;
   title: string;
   body: string;
+  amount?: number;
   createdAt: string;
   read: boolean;
 }

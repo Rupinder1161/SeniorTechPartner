@@ -30,7 +30,6 @@ export const dashboardStats: DashboardStats = {
   totalReferrals: 21,
   completedReferrals: 15,
   pendingReferrals: 3,
-  paidReferrals: 13,
 };
 
 const examples: Referral[] = [

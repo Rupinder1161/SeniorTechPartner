@@ -18,8 +18,8 @@ export async function getDashboard(): Promise<DashboardData> {
     stats: {
       totalReferrals: referrals.length,
       completedReferrals: completedJobs,
-      pendingReferrals: referrals.filter((referral) => referral.status === 'pending' || referral.status === 'booked').length,
-      paidReferrals: referrals.filter((referral) => referral.commission.status === 'paid').length,
+      pendingReferrals: referrals.filter((referral) => referral.status === 'pending').length,
+      inProgressReferrals: referrals.filter((referral) => referral.status === 'contacted' || referral.status === 'booked').length,
     },
     recentReferrals: referrals.slice(0, 3),
   };
